@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC     -shared -Wl,-soname,libcache.so -o lib/libcache.so CMakeFiles/cache.dir/src/ARCfunc.cc.o CMakeFiles/cache.dir/src/LFUfunc.cc.o CMakeFiles/cache.dir/src/LRUfunc.cc.o 

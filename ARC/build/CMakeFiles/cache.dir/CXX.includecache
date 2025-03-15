@@ -1,0 +1,28 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/root/SOURCE_CODE/CACHE/ARC/include/ARCCacheHeader.h
+iostream
+-
+string
+-
+unordered_map
+-
+
+/root/SOURCE_CODE/CACHE/ARC/src/ARCfunc.cc
+../include/ARCCacheHeader.h
+/root/SOURCE_CODE/CACHE/ARC/include/ARCCacheHeader.h
+
+/root/SOURCE_CODE/CACHE/ARC/src/LFUfunc.cc
+../include/ARCCacheHeader.h
+/root/SOURCE_CODE/CACHE/ARC/include/ARCCacheHeader.h
+
+/root/SOURCE_CODE/CACHE/ARC/src/LRUfunc.cc
+../include/ARCCacheHeader.h
+/root/SOURCE_CODE/CACHE/ARC/include/ARCCacheHeader.h
+
