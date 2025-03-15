@@ -1,9 +1,9 @@
 #pragma once 
 #include <iostream>
 #include <string>
-#include <unordered_map>  // 使用c++自带的哈希表
+#include <unordered_map>          // 使用c++自带的哈希表
 #ifndef ARCCACHEHEADER
-#define ARCCACHEHEADER   // 避免头文件重复定义
+#define ARCCACHEHEADER            // 避免头文件重复定义
 #define Init_Capacity 30
 #define Init_Transfrom_Time 3
 
