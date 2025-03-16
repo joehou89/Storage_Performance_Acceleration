@@ -18,26 +18,18 @@
 // LRU类部分
 class LRUCache {
 public:
-    LRUCache() {
-      capacity = CACHE_CAPACITY;
-      ghost_capacity = CACHE_CAPACITY;
+    LRUCache():capacity(CACHE_CAPACITY),ghost_capacity(CACHE_CAPACITY) {
     }
+    LRUCache(uint64 capacity):capacity(capacity),ghost_capacity(capacity) {
+    }
+    LRUCache(uint64 capacity, uint64 transform_time):capacity(capacity),ghost_capacity(capacity),
+        transform_time(transform_time) {
+    }  
 
-    LRUCache(uint64 capacity) {
-      capacity = capacity;
-      ghost_capacity = capacity;
-    }
-
-    LRUCache(uint64 capacity, uint64 transform_time) {
-        capacity = capacity;
-        ghost_capacity = capacity;
-        transform_time = transform_time;
-    }
-    
-    bool cache_insert(DataType data);                       // 插入元素
+    void cache_insert(DataType data);                       // 插入元素
     void cache_insert_and_extend(DataType data);            // 插入并且扩充一格
     bool cache_evict_and_subtract();                        // 删除末尾元素且空间缩减，返回是否成功
-    bool check_ghost(DataType data);                        // 检查ghost中是否有对应元素,有则返回true
+    bool cache_check_ghost(DataType data);                  // 检查ghost中是否有对应元素,有则返回true
     void cache_show(bool show_ghost);                       // 显示所有元素
 
 private:

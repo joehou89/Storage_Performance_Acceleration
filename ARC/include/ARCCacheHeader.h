@@ -23,79 +23,30 @@
 using namespace std;
 
 
-
-// LFU类部分
-class LFUcache {
-public:
-    LFUcache() {
-        this->capacity = CACHE_CAPACITY;
-        this->ghost_capacity = CACHE_CAPACITY;
-    }
-    LFUcache(int capacity) {
-        // 注意这里不够健壮,这是由于初始化的capacity可能小于0，但暂且不管健壮性s
-        this->capacity = capacity;
-        this->ghost_capacity = capacity;
-        // 分配同样大小的空间
-    }
-    LFUcache(int capacity, int transform_time) {
-        // 注意这里不够健壮,这是由于初始化的capacity可能小于0，但暂且不管健壮性s
-        this->capacity = capacity;
-        this->ghost_capacity = capacity;
-        this->transform_time = transform_time;
-        // 分配同样大小的空间
-    }
-    void put(DataType data); // 向LFU内增加缓存元素
-    void Add(DataType data); 
-    bool Subtract();
-    bool check_ghost(DataType data); // 检查ghost中是否有对应元素,有则返回true
-    void Show(bool show_ghost);
-private:
-    CacheList* cache = nullptr;
-    unordered_map<DataType, CacheList*> map;
-    int size = 0;
-    int capacity = CACHE_CAPACITY;
-    
-    int transform_time = CACHE_TRANSFROM_COUNT; // 需要和LRU内一致
-    
-    CacheList* ghost = nullptr;
-    unordered_map<DataType, CacheList*> ghost_map;
-    int ghost_size = 0;
-    int ghost_capacity = CACHE_CAPACITY;
-    
-    void DetachNode(CacheList* L, bool is_ghost);
-    void DeleteTail(bool is_ghost); // 删除尾部元素
-    void Insert(CacheList* L, bool is_ghost);     // 有序插入元素
-};
-
 class ARCcache {
 public:
-    ARCcache() {
-        this->capacity = CACHE_CAPACITY;
-        this->Rcache = new LRUcache(CACHE_CAPACITY);
-        this->Fcache = new LFUcache(CACHE_CAPACITY);
+    ARCcache():_capacity(CACHE_CAPACITY),_size(0),_transform_time(CACHE_TRANSFROM_COUNT) {
+        _lrucache = new LRUcache(CACHE_CAPACITY);
+        _lfucache = new LFUcache(CACHE_CAPACITY);
     }
-    ARCcache(int capacity) {
-        this->Rcache = new LRUcache(capacity);
-        this->Fcache = new LFUcache(capacity);
-        this->capacity = capacity;
+    ARCcache(uint64 capacity):_capacity(capacity),_size(0),_transform_time(CACHE_TRANSFROM_COUNT) {
+        _lrucache = new LRUcache(capacity);
+        _lfucache = new LFUcache(capacity);
     }
-    ARCcache(int capacity, int transform_time) {
-        this->Rcache = new LRUcache(capacity,transform_time);
-        this->Fcache = new LFUcache(capacity,transform_time);
-        this->capacity = capacity;
-        this->transform_time = transform_time;
+    ARCcache(uint64 capacity, int transform_time):_capacity(capacity),_size(0),_transform_time(transform_time)  {
+        _lrucache = new LRUcache(capacity,transform_time);
+        _lfucache = new LFUcache(capacity,transform_time);
     }
-    void put(DataType data);
-    void Show(bool show_ghost);
-private: 
-    // 一共有两个缓存指针,  分别存储Rcache和Fcache
-    LRUcache* Rcache = nullptr;
-    LFUcache* Fcache = nullptr;
-    int size = 0;
-    int capacity = CACHE_CAPACITY;
-    int transform_time = CACHE_TRANSFROM_COUNT;  // 初始化为初始转变次数
-    // 初始转变次数是触发消息频次达到几次时， 就加入LFU的cache
-    // 默认加入的是LRU的cache,但是当触发达到一定次数，就会加入LFU的cache
+
+    void cache_insert(DataType data);
+    void cache_show(bool show_ghost);
+
+private:
+    LRUCache *_lrucache;
+    LFUCache *_lfucache;
+    uint64 size;
+    uint64 capacity;
+    int transform_time;
 };
 
 

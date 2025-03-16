@@ -1,7 +1,20 @@
-#include "../include/ARCCacheHeader.h"
+/*******************************************************************************
+ Copyright (c) 2025, Hangzhou Technologies Co., Ltd. All rights reserved.
+--------------------------------------------------------------------------------
+                                      ARCCache.cc
+工程代码: ARC
+模块名字: ARC缓存
+创建时间: 2025-03-16
+    作者: joehou89
+    描述: ARC类实现
+--------------------------------------------------------------------------------
+*******************************************************************************/
+
+
+#include "ARCCacheHeader.h"
 
 // 将元素输入ARC缓存表中
-void ARCcache::put(DataType data) {
+void ARCcache::cache_insert(DataType data) {
     bool find = false;
     // 先在各个表的ghost中搜索
     if (this->Rcache->check_ghost(data)) { // 这个删除
