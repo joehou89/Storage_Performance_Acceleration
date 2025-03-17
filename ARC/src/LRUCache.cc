@@ -29,7 +29,7 @@ bool LRUCache::cache_insert(DataType data) {
     else { // map中没有找到
         CacheList* L = new CacheList(); // 新建缓存节点
         map[data] = L;  // 将节点存储在哈希表中
-        if (this->size == this->capacity) {
+        if (_size == _capacity) {
             delete_tail_listnode(false);
             // 删除节点，探后放进ghost中
         }
