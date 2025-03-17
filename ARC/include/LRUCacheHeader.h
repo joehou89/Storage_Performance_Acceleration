@@ -36,9 +36,9 @@ private:
     CacheList* _cache = nullptr;
     CacheList* _ghost = nullptr;
     uint64 _capacity = CACHE_CAPACITY;
-    int ghost_capacity = CACHE_CAPACITY; // ghost链表的存储空间(固定不变的)
+    uint64 _ghost_capacity = CACHE_CAPACITY; // ghost链表的存储空间(固定不变的)
     uint64 _size = 0;
-    uint64 ghost_size = 0;
+    uint64 _ghost_size = 0;
     std::unordered_map<DataType, CacheList*> _map;
     std::unordered_map<DataType, CacheList*> _ghost_map;
     

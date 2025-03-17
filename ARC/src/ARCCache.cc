@@ -16,25 +16,21 @@
 // 将元素输入ARC缓存表中
 void ARCcache::cache_insert(DataType data) {
     bool find = false;
-    // 先在各个表的ghost中搜索
-    if (this->Rcache->check_ghost(data)) { // 这个删除
-        // 缩减Fcache, 如果不成功,则调用put函数
-        if (this->Fcache->Subtract()) {
-            this->Rcache->Add(data);  // 扩容Rcache
+    if (_lrucache->cache_check_ghost(data)) {
+        if (_lfucache->cache_evict_and_subtract()) {
+            _lrucache->cache_insert_and_extend(data);
         }
-        else { // Fcache缩容失败,此时直接加入Rcache中
-            this->Rcache->put(data);
-            // 进行put一次，由于在ghost列表中找到,
-            // 原先数组中应该没有这个数，理论上不用if
+        else {
+            _lrucache->cache_insert(data);
         }
         find = true;
     }
-    if (this->Fcache->check_ghost(data)) {
-        if (this->Rcache->Subtract()) {
-            this->Fcache->Add(data); // 扩容
+    if (_lfucache->cache_check_ghost(data)) {
+        if (_lrucache->cache_evict_and_subtract()) {
+            _lfucache->cache_insert_and_extend(data);
         }
         else {
-            this->Fcache->put(data); // 不扩容直接放
+            _lfucache->cache_insert(data);
         }
         find = true;
     }
@@ -42,8 +38,9 @@ void ARCcache::cache_insert(DataType data) {
     // 如果两个的ghost中都没有对应的数, 则不改变partition(两个容量不改变)
     if (!find) {
         // 优先加入LRUcache中, 作为第一个元素
-        if (this->Rcache->put(data)) this->Fcache->put(data);
-        // 使用put函数向Fcache中也添加对应元素
+        if (_lrucache->cache_insert(data)) {
+            _lfucache->cache_insert(data);
+        }
     }
 }
 
