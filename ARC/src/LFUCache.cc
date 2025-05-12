@@ -1,14 +1,14 @@
 #include "../include/ARCCacheHeader.h"
 
 // 插入元素，其中插入的次数直接设为transform_time
-void LFUcache::put(DataType data) {
+void LFUcache::cache_insert(DataType data) {
     if (this->capacity == 0) return; // 不能加入元素
     if (this -> map.find(data)!= this->map.end()) {
         // 列表中有该元素
         CacheList* L = map[data];
         this -> DetachNode(L, false);
         L->time += 1;   // 增加使用次数标记
-        Insert(L, false);
+        insert(L, false);
         cout << "after insert:" << L->time << endl;
     }
     else { // 没有找到, 考虑删除或者插入元素
@@ -21,12 +21,12 @@ void LFUcache::put(DataType data) {
         
         cout << "putting : " << L->key << "the time is " <<  this -> transform_time << endl;
         this->map[data] = L;
-        Insert(L, false);
+        insert(L, false);
     }
 }
 
 // 插入函数, 将节点插入表中,插入方法是有序插入
-void LFUcache::Insert(CacheList* L, bool is_ghost) {
+void LFUcache::insert(CacheList* L, bool is_ghost) {
     if (!is_ghost) {
         // 有序插入算法
         if (!cache) { // 空则建立结点
@@ -53,26 +53,26 @@ void LFUcache::Insert(CacheList* L, bool is_ghost) {
             pre->next = L;
             q->prev = L;
         }
-        this->size += 1;
+        this->size++;
     }
     else{ // 将节点插入ghost
-        if (!ghost) {
-            this->ghost = L;
-            ghost->next = ghost;
-            ghost->prev = ghost;
+        if (!_ghost) {
+            _ghost = L;
+            _ghost->next = _ghost;
+            _ghost->prev = _ghost;
         }
-        else if (ghost->time < L->time) {
-            CacheList *p = ghost->prev;
-            L->next = ghost;
+        else if (_ghost->time < L->time) {
+            CacheList *p = _ghost->prev;
+            L->next = _ghost;
             L->prev = p;
             p->next = L;
-            ghost->prev = L;
-            this->ghost = L;  // 更新头结点
+            _ghost->prev = L;
+            _ghost = L;  // 更新头结点
         }
         else {
-            CacheList* pre = ghost;
+            CacheList* pre = _ghost;
             // 在循环链表中有序插入元素
-            for (; pre->next != ghost && pre->next->time > L->time; pre = pre->next);
+            for (; pre->next != _ghost && pre->next->time > L->time; pre = pre->next);
             // 将L插入到pre的尾部即可
             CacheList* q = pre->next;
             L->prev = pre;
@@ -80,80 +80,82 @@ void LFUcache::Insert(CacheList* L, bool is_ghost) {
             pre->next = L;
             q->prev = L;
         }
-        this->ghost_size += 1;
+        _ghost_size++;
     }
 }
 
 // 添加元素并且增加空间
-void LFUcache::Add(DataType data) {
-    this->capacity += 1;
+void LFUcache::cache_insert_and_expend(DataType data) {
+    _capacity += 1;
     CacheList* L = new CacheList();
     L->key = data;
     L->time = 1;  // 此时调用的次数设为1
     this->map[data] = L;
-    Insert(L, false);
+    insert(L, false);
 }
 
 // 删除尾元素
-void LFUcache::DeleteTail(bool is_ghost) {
+void LFUcache::delete_tail_listnode(bool is_ghost) {
     if (!is_ghost) {
-        CacheList* remove;
-        if (!this->cache) throw("no element to delete");
+        CacheList* remove = nullptr;
+        if (!_cache) throw("no element to delete");
         // 删除节点，哈希值并将其移动到ghost表中
-        else if (this->size == 1) { //删除头结点
-            remove = cache;
-            this->cache = nullptr;
+        else if (_size == 1) { //删除头结点
+            remove = _cache;
+            _cache = nullptr;
         }
         else { // 移除尾结点
-            remove = cache->prev;
+            remove = _cache->prev;
             CacheList* q = remove->prev;
-            q->next = cache;
-            cache->prev = q;
+            q->next = _cache;
+            _cache->prev = q;
         }
-        remove->prev = nullptr; remove->next = nullptr; remove->time = 0;
-        map.erase(remove->key);
-        if (this->ghost_size == this->ghost_capacity) DeleteTail(true);
+        remove->prev = nullptr;
+        remove->next = nullptr;
+        remove->time = 0;
+        _map.erase(remove->key);
+        if (_ghost_size == _ghost_capacity) delete_tail_listnode(true);
         
-        this -> ghost_map[remove->key] = remove;   // 加入到ghost_map 的哈希表中
-        Insert(remove, true);
-        this->size -= 1;
+        _ghost_map[remove->key] = remove;   // 加入到ghost_map 的哈希表中
+        insert(remove, true);
+        _size--;
     }
     else { // 删除ghost中的结尾元素
-        if (!this->ghost) {
+        if (!_ghost) {
             throw("no element to delete");
         }
         CacheList* remove;
-        if (this->ghost_size == 1) {
-            remove = ghost;
-            this->ghost = nullptr;
+        if (_ghost_size == 1) {
+            remove = _ghost;
+            _ghost = nullptr;
         }
         else {
-            remove = ghost->prev;
+            remove = _ghost->prev;
             CacheList* q = remove->prev;
-            q->next = ghost;
-            ghost->prev = q;
+            q->next = _ghost;
+            _ghost->prev = q;
         }
-        ghost_map.erase(remove->key);
+        _ghost_map.erase(remove->key);
         delete remove;  // 释放指针空间和哈希表空间
-        this->ghost_size -= 1;
+        _ghost_size--;
     }
 
 }
 
 // 主表时(put调用)往其他位置有序insert, ghost表时(仅有check_ghost调用)，向主表中insert
-void LFUcache::DetachNode(CacheList*L, bool is_ghost) {
+void LFUcache::detach_listnode(CacheList*L, bool is_ghost) {
     // Detach操作相同,直接复制粘贴FRUfunc的代码
     if (!is_ghost) {
-        if (this->size == 0) {
+        if (_size == 0) {
             throw runtime_error("nothing to detach!");
         }
-        if (this->size == 1) {
-            this->cache = nullptr;
+        if (_size == 1) {
+            _cache = nullptr;
         }
-        else if (L == cache) { // 暂时清除头结点
-            this->cache = L->next;
-            cache->prev = L->prev;
-            L->prev->next = cache;
+        else if (L == _cache) { // 暂时清除头结点
+            _cache = L->next;
+            _cache->prev = L->prev;
+            L->prev->next = _cache;
         }
         else { // 取出中间节点
             CacheList* q = L->prev;
@@ -161,20 +163,20 @@ void LFUcache::DetachNode(CacheList*L, bool is_ghost) {
             L->next->prev = q;
         }
         L->prev = nullptr; L->next = nullptr;
-        size -= 1;
+        size--;
     }
     else {
-        ghost_map.erase(L->key);
+        _ghost_map.erase(L->key);
         // 注意: 由于之后指针会往主list中放, 不释放指针
-        if (this->ghost_size == 1) {
-            this->ghost = nullptr;
+        if (_ghost_size == 1) {
+            _ghost = nullptr;
         }
-        else if (L == ghost) {
+        else if (L == _ghost) {
             // 删除头结点
-            CacheList* p = this->ghost;
-            this->ghost = L->next; // 重置
-            ghost->prev = L->prev;
-            L->prev->next = ghost;
+            CacheList* p = _ghost;
+            _ghost = L->next; // 重置
+            _ghost->prev = L->prev;
+            L->prev->next = _ghost;
         }
         else { // 连接前后节点
             CacheList* q = L->prev;
@@ -185,30 +187,30 @@ void LFUcache::DetachNode(CacheList*L, bool is_ghost) {
         L->prev = nullptr;
         L->next = nullptr;
         L->time = 1;            // 将time重置为1
-        ghost_size -= 1;
+        _ghost_size--;
     }
 }
 
 // 删除结尾元素并减少容量
-bool LFUcache::Subtract() {
-    if (this ->capacity == 0) return false;
+bool LFUcache::cache_evict_and_subtract() {
+    if (_capacity == 0) return false;
     // 如果表满,则删除节点并放入ghost数组, 否则不用删除节点
-    if (this ->size == this ->capacity) DeleteTail(false);
-    this->capacity -= 1;
+    if (_size == _capacity) delete_tail_listnode(false);
+    _capacity--;
     return true;
 };
 
 // 在ghost中进行查找，如果有则删除对应ghost中的元素并返回true(接下来总函数会调用put)
 bool LFUcache::check_ghost(DataType data) {
     if (ghost_map.find(data)!= ghost_map.end()) {
-        this ->DetachNode(ghost_map[data], true);
+        detach_listnode(ghost_map[data], true);
         return true;
     }
     return false;
 }
 
 // 显示缓存内容
-void LFUcache::Show(bool show_ghost) {
+void LFUcache::cache_show(bool show_ghost) {
     CacheList* p = this->cache;
     cout << "=============== Last frequently used =========" << endl;
     if (!p) {

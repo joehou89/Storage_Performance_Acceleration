@@ -5,7 +5,7 @@
 工程代码: LRU
 模块名字: LRU缓存
 创建时间: 2025-03-17
-    作者: joehou89
+    作者: houchao
     描述: LRU类实现
 --------------------------------------------------------------------------------
 *******************************************************************************/
@@ -57,7 +57,7 @@ void LRUCache::insert(CacheList *L, bool is_ghost) {
             ghost->prev = L;
             this->ghost = L;
         }
-        this->ghost_size += 1;
+        this->ghost_size++;
     }
     else { // 向主表内插入
         if (!cache) { // 对于头结点为空的情况
@@ -73,7 +73,7 @@ void LRUCache::insert(CacheList *L, bool is_ghost) {
             q->next = L;
             this->cache = L;
         }
-        this->size += 1;
+        this->size++;
         // 插入完毕之后，头结点是最近访问的元素
     }
 };
@@ -109,7 +109,7 @@ void LRUCache::detach_listnode(CacheList* L, bool is_ghost) {
         if (_ghost_size == 1) {
             _ghost = nullptr;
         }
-        else if (L == ghost) { 
+        else if (L == _ghost) {
             // 删除头结点
             CacheList* p = _ghost;
             _ghost = L->next; // 重置
