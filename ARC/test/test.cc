@@ -9,9 +9,9 @@ int main()
     DataType input; 
     while(true) {
         getline(cin, input);
-        container.put(input);
+        container.cache_insert(input);
         if (input == "exit") break;
-        container.Show(true);  // 改为false时，不显示ghost表中的内容
+        container.cache_show(true);  // 改为false时，不显示ghost表中的内容
     }
     return 0;
 }

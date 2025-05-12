@@ -28,7 +28,7 @@ bool LRUCache::cache_insert(DataType data) {
     }
     else { // map中没有找到
         CacheList* L = new CacheList(); // 新建缓存节点
-        map[data] = L;  // 将节点存储在哈希表中
+        _map[data] = L;  // 将节点存储在哈希表中
         if (_size == _capacity) {
             delete_tail_listnode(false);
             // 删除节点，探后放进ghost中
@@ -44,36 +44,36 @@ bool LRUCache::cache_insert(DataType data) {
 void LRUCache::insert(CacheList *L, bool is_ghost) {
     if (!L) return;
     if (is_ghost) {
-        if (!this->ghost) {
-            ghost = L;
-            ghost->next = ghost;
-            ghost->prev = ghost;
+        if (!_ghost) {
+            _ghost = L;
+            _ghost->next = _ghost;
+            _ghost->prev = _ghost;
         }
         else {
-            CacheList* q = ghost->prev;
-            L->next = ghost;
+            CacheList* q = _ghost->prev;
+            L->next = _ghost;
             L->prev = q;
             q->next = L; 
-            ghost->prev = L;
-            this->ghost = L;
+            _ghost->prev = L;
+            _ghost = L;
         }
-        this->ghost_size++;
+        _ghost_size++;
     }
     else { // 向主表内插入
-        if (!cache) { // 对于头结点为空的情况
-            cache = L;
-            cache->next = cache;
-            cache->prev = cache;
+        if (!_cache) { // 对于头结点为空的情况
+            _cache = L;
+            _cache->next = _cache;
+            _cache->prev = _cache;
         }
         else {// 由于是头结点访问时间最近，所以使用头插方法, 插入完之后重新给head节点赋值
-            CacheList* q = cache->prev;
-            L->next = cache;
+            CacheList* q = _cache->prev;
+            L->next = _cache;
             L->prev = q;
-            cache->prev = L;
+            _cache->prev = L;
             q->next = L;
-            this->cache = L;
+            _cache = L;
         }
-        this->size++;
+        _size++;
         // 插入完毕之后，头结点是最近访问的元素
     }
 };

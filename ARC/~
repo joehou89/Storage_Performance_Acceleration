@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.14.5)
+cmake_minimum_required(VERSION 2.8.12)
 project(cache)
 
 # 设置 C++11 标准
-#set(CMAKE_CXX_STANDARD 11)
-#set(CMAKE_CXX_STANDARD_REQUIRED ON)
-#set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_LDFLAGS}")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${CMAKE_LDFLAGS}")
@@ -24,6 +24,4 @@ add_library(cache SHARED ${CACHE_FILE})
 # 生成文件到指定位置
 set(LIBRARY_OUTPUT_PATH lib/)
 
-# 生成测试用例可执行文件
 add_executable(MyExecutable test/test.cc)
-target_link_libraries(MyExecutable cache)

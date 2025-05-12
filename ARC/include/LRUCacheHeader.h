@@ -11,22 +11,19 @@
 *******************************************************************************/
 
 #include <iostream>
-#include <string>
 #include <unordered_map>
-#include "infra_comp.h"
+
+
 
 // LRU类部分
 class LRUCache {
 public:
-    LRUCache():capacity(CACHE_CAPACITY),ghost_capacity(CACHE_CAPACITY) {
+    LRUCache():_capacity(CACHE_CAPACITY),_ghost_capacity(CACHE_CAPACITY) {
     }
-    LRUCache(uint64 capacity):capacity(capacity),ghost_capacity(capacity) {
+    LRUCache(uint64 capacity):_capacity(capacity),_ghost_capacity(capacity) {
     }
-    LRUCache(uint64 capacity, uint64 transform_time):capacity(capacity),ghost_capacity(capacity),
-        transform_time(transform_time) {
-    }  
 
-    void cache_insert(DataType data);                       // 插入元素
+    bool cache_insert(DataType data);                       // 插入元素
     void cache_insert_and_extend(DataType data);            // 插入并且扩充一格
     bool cache_evict_and_subtract();                        // 删除末尾元素且空间缩减，返回是否成功
     bool cache_check_ghost(DataType data);                  // 检查ghost中是否有对应元素,有则返回true

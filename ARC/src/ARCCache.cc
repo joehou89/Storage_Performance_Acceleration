@@ -13,6 +13,7 @@
 
 #include "ARCCacheHeader.h"
 
+
 // 将元素输入ARC缓存表中
 void ARCcache::cache_insert(DataType data) {
     bool find = false;
@@ -44,9 +45,12 @@ void ARCcache::cache_insert(DataType data) {
     }
 }
 
-void ARCcache::Show(bool show_ghost) {
+void ARCcache::cache_show(bool show_ghost) {
     cout << "%%%%%%%%%%%%%%%%%%% Begin %%%%%%%%%%%%%%%%%%%%%%" << endl;
-    this->Rcache->Show(show_ghost);
-    this->Fcache->Show(show_ghost);
+    _lrucache->cache_show(show_ghost);
+    _lfucache->cache_show(show_ghost);
     cout << "%%%%%%%%%%%%%%%%%%%% end %%%%%%%%%%%%%%%%%%%%%%%" << endl;
 }
+
+
+

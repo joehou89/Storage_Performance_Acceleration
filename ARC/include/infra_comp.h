@@ -13,11 +13,13 @@
 #define CACHE_CAPACITY 30
 #define CACHE_TRANSFROM_COUNT 3
 
+#include <string>
+using namespace std;
 typedef unsigned long uint64;
 typedef string DataType;
 
 //缓存节点列表结构体
-typedef struct CacheList {
+struct CacheList {
     DataType key;  
     uint64 time = 0;                 //定义使用计数器，计算使用次数
     CacheList* prev;
